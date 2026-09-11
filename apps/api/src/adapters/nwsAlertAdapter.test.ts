@@ -1,0 +1,3 @@
+import { describe, expect, it } from 'vitest';
+import { adaptNwsAlerts } from './nwsAlertAdapter.js';
+describe('NWS adapter', () => { it('keeps polygon alerts and safely accepts missing geometry', () => { const result = adaptNwsAlerts({ features: [{ id: 'a', geometry: null, properties: { event: 'Tornado Warning', severity: 'Severe', sent: '2026-01-01T00:00:00Z' } }, { id: 'b', geometry: { type: 'Polygon', coordinates: [[[-90, 30], [-89, 30], [-89, 31], [-90, 30]]] }, properties: { event: 'Flood Warning', severity: 'Moderate', sent: '2026-01-01T00:00:00Z' } }] }); expect(result.events[0]?.latitude).toBeNull(); expect(result.events[1]?.geometry?.type).toBe('Polygon'); }); });

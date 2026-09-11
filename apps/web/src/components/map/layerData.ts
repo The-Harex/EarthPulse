@@ -1,0 +1,7 @@
+import type { EarthEvent, ObservationFeature } from '@earth-pulse/shared';
+import type { FeatureCollection } from 'geojson';
+const empty: FeatureCollection = { type: 'FeatureCollection', features: [] };
+export const emptyCollection = empty;
+export function eventPoints(events: EarthEvent[]): FeatureCollection { return { type: 'FeatureCollection', features: events.filter((event) => event.latitude != null && event.longitude != null && event.type !== 'weather-alert').map((event) => ({ type: 'Feature' as const, id: event.id, geometry: { type: 'Point' as const, coordinates: [event.longitude!, event.latitude!] }, properties: { id: event.id, type: event.type, severity: event.severity } })) }; }
+export function alertPolygons(events: EarthEvent[]): FeatureCollection { return { type: 'FeatureCollection', features: events.filter((event) => event.type === 'weather-alert' && event.geometry && event.geometry.type !== 'Point').map((event) => ({ type: 'Feature' as const, id: event.id, geometry: event.geometry!, properties: { id: event.id, severity: event.severity } })) }; }
+export function wildfireFeatures(features: ObservationFeature[]): FeatureCollection { return { type: 'FeatureCollection', features: features.map((feature) => ({ type: 'Feature' as const, id: feature.id, geometry: { type: 'Point' as const, coordinates: [feature.longitude, feature.latitude] }, properties: { id: feature.id, count: feature.kind === 'cluster' ? feature.count : 1, kind: feature.kind } })) }; }

@@ -1,0 +1,20 @@
+{
+  "name": "earth-pulse",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @earth-pulse/api --filter @earth-pulse/web dev",
+    "build": "pnpm -r build",
+    "start": "node apps/api/dist/server.js",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint"
+  },
+  "devDependencies": {
+    "railway": "^3.11.0"
+  }
+}

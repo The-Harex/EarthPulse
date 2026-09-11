@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: earth_pulse
+      POSTGRES_USER: earth_pulse
+      POSTGRES_PASSWORD: earth_pulse
+    ports:
+      - '5432:5432'
+    volumes:
+      - earth-pulse-postgres:/var/lib/postgresql/data
+
+volumes:
+  earth-pulse-postgres:

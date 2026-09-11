@@ -1,0 +1,3 @@
+import { describe, expect, it } from 'vitest';
+import { adaptEonetEvents } from './eonetAdapter.js';
+describe('EONET adapter', () => { it('maps a current geometry and retains history', () => { const result = adaptEonetEvents({ events: [{ id: 'x', title: 'Etna', categories: [{ id: 'volcanoes', title: 'Volcanoes' }], sources: [{ url: 'https://example.com' }], geometry: [{ date: '2026-01-01T00:00:00Z', type: 'Point', coordinates: [15, 37] }] }] }); expect(result.events[0]).toMatchObject({ id: 'eonet:x', type: 'volcano', longitude: 15, latitude: 37, metadata: { kind: 'eonet', open: true } }); }); });

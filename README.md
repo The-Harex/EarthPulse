@@ -20,6 +20,7 @@ Requirements: Node.js 22.13 or newer and pnpm 11.
 
 ```bash
 pnpm install
+Copy-Item .env.example .env
 docker compose up -d postgres
 pnpm --filter @earth-pulse/api db:migrate
 pnpm dev
@@ -27,7 +28,16 @@ pnpm dev
 
 The dashboard opens at `http://localhost:5173`; Fastify listens on `http://localhost:3001`. Vite proxies `/api` to Fastify during development.
 
-Run `pnpm --filter @earth-pulse/api ingest` to populate the database once, or `pnpm --filter @earth-pulse/api dev:ingest` for local scheduled ingestion. Production runs `ingest` as a separate five-minute scheduled job; the API only reads persisted data.
+For local wildfire validation, set `FIRMS_MAP_KEY` in `.env` and set `IN_PROCESS_INGESTION=true`, then restart `pnpm dev`. Run `pnpm --filter @earth-pulse/api ingest` to populate the database once, or `pnpm --filter @earth-pulse/api dev:ingest` for local scheduled ingestion. Production uses the same in-process ingestion loop.
+
+After ingestion, verify the live data contract locally before relying on the map:
+
+```powershell
+Invoke-RestMethod http://localhost:3001/api/status
+Invoke-RestMethod 'http://localhost:3001/api/observations?type=wildfire-detection&zoom=1'
+```
+
+The first endpoint must report FIRMS as configured and healthy. The second must report a nonzero `totalDetections` when NASA FIRMS has current detections. In the browser, the **Wildfires** filter must show that detection count and orange map markers; tapping a marker opens its detail view.
 
 Quality commands:
 

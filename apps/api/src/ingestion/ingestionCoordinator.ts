@@ -27,7 +27,17 @@ export class IngestionCoordinator {
       const lock = await import('kysely').then(({ sql }) => sql<{ acquired: boolean }>`SELECT pg_try_advisory_lock(${1_938_472_031}) AS acquired`.execute(connection));
       if (!lock.rows[0]?.acquired) return { acquired: false, providers: [] as ProviderName[] };
       const completed: ProviderName[] = [];
-      try { for (const registration of providerRegistry) if (await this.state.isDue(registration.name, registration.intervalMs, now)) { await this.ingest(registration.name, now); completed.push(registration.name); } }
+      try {
+        for (const registration of providerRegistry) {
+          const newlyConfiguredFirms = registration.name === 'firms'
+            && this.providers.firms.configured
+            && !(await this.state.get('firms')).configured;
+          if (newlyConfiguredFirms || await this.state.isDue(registration.name, registration.intervalMs, now)) {
+            await this.ingest(registration.name, now);
+            completed.push(registration.name);
+          }
+        }
+      }
       finally { await import('kysely').then(({ sql }) => sql`SELECT pg_advisory_unlock(${1_938_472_031})`.execute(connection)); }
       return { acquired: true, providers: completed };
     });
@@ -48,4 +58,3 @@ export class IngestionCoordinator {
     }
   }
 }
-

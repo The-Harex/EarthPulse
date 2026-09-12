@@ -1,0 +1,9 @@
+import type { ObservationFeature } from '@earth-pulse/shared';
+import { Flame, Radio, Satellite } from 'lucide-react';
+import { coordinate, dateTime, relativeTime } from '@/lib/format';
+
+export function WildfireDetails({ feature }: { feature: ObservationFeature }) {
+  const clustered = feature.kind === 'cluster';
+  const detectedAt = clustered ? feature.latestAt : feature.observedAt;
+  return <div className="detail-content"><div className="detail-hero"><div className="detail-type severity-high"><Flame /> Fire activity</div><p>{clustered ? `${feature.count.toLocaleString()} satellite detections in this area` : 'Satellite fire detection'}</p><span className="severity-pill severity-high">{clustered ? 'detection cluster' : feature.confidence ?? 'confidence unknown'}</span></div><div className="coordinate-grid"><div><span>LATITUDE</span><strong>{coordinate(feature.latitude, 'N', 'S')}</strong></div><div><span>LONGITUDE</span><strong>{coordinate(feature.longitude, 'E', 'W')}</strong></div></div><dl className="detail-list"><div><dt>{clustered ? 'Latest detection' : 'Detected'}</dt><dd>{dateTime(detectedAt)} <small>{relativeTime(detectedAt)}</small></dd></div>{clustered && <div><dt>Detections</dt><dd>{feature.count.toLocaleString()}</dd></div>}{clustered && feature.maxFireRadiativePower != null && <div><dt>Peak fire power</dt><dd>{feature.maxFireRadiativePower.toFixed(1)} MW</dd></div>}{!clustered && feature.fireRadiativePower != null && <div><dt>Fire power</dt><dd>{feature.fireRadiativePower.toFixed(1)} MW</dd></div>}{!clustered && feature.satellite && <div><dt>Satellite</dt><dd><Satellite /> {feature.satellite}{feature.instrument ? ` · ${feature.instrument}` : ''}</dd></div>}<div><dt>Source</dt><dd><Radio /> {clustered ? 'NASA FIRMS' : feature.source}</dd></div></dl><p className="score-note">These are satellite heat detections, not confirmed named fire incidents.</p></div>;
+}
